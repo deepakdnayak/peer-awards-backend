@@ -133,6 +133,13 @@ backend/
 │   │   │   ├── auth.service.ts      # Core auth logic
 │   │   │   └── auth.routes.ts       # Auth route definitions
 │   │   │
+│   │   ├── final/
+│   │   │   ├── finalNominee.model.ts # Final Nominee schema
+│   │   │   ├── result.model.ts       # Final Result schema
+│   │   │   ├── vote.model.ts         # Vote schema
+│   │   │   ├── final.service.ts      # Final Service logic
+│   │   │   ├── final.controller.ts   # Final Route handler
+│   │   │   └── final.routes.ts       # Final routes
 │   │   ├── user/
 │   │   │   ├── user.model.ts        # Mongoose user schema
 │   │   │   ├── user.service.ts      # CSV processing logic
@@ -186,7 +193,6 @@ backend/
 | `nominations` | Nomination records (1 per user per title) |
 | `finalvotes` | Final voting records (Phase 3) |
 | `system_config` | Current phase and global app settings |
-| `audit_logs` | Immutable log of all critical actions |
 
 ---
 
@@ -214,7 +220,7 @@ Step 6: JWT token issued → used for all subsequent authenticated requests
 
 ## 📡 API Endpoints
 
-All endpoints are prefixed with `/api`.
+Few endpoints prefixed with `/api`.
 
 ---
 
