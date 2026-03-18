@@ -16,3 +16,8 @@ export const uploadUsers = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error uploading users" });
   }
 };
+
+export const getAllUsers = async (_: Request, res: Response) => {
+  const data = await UserService.getAllUsers();
+  res.json(data);
+};
