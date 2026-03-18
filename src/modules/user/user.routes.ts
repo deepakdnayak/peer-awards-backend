@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadUsers } from "./user.controller";
+import { uploadUsers, getAllUsers } from "./user.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { adminMiddleware } from "../../middlewares/admin.middleware";
 
@@ -16,5 +16,7 @@ router.post(
   upload.single("file"),
   uploadUsers
 );
+
+router.get("/all", getAllUsers);
 
 export default router;

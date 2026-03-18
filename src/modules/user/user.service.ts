@@ -3,6 +3,7 @@ import csv from "csv-parser";
 import { User } from "./user.model";
 
 export class UserService {
+
   static async processCSV(filePath: string) {
     const users: any[] = [];
 
@@ -34,6 +35,13 @@ export class UserService {
           resolve({ added, skipped });
         })
         .on("error", reject);
+    });
+  }
+
+  // Get approved titles
+  static async getAllUsers() {
+    return await User.find({
+      role: "student",
     });
   }
 }
