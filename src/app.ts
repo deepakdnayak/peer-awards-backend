@@ -4,6 +4,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import userRoutes from "./modules/user/user.routes";
 import titleRoutes from "./modules/title/title.routes";
 import nominationRoutes from "./modules/nomination/nomination.routes";
+import finalRoutes from "./modules/final/final.routes";
 
 const app = express();
 
@@ -14,5 +15,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/titles", titleRoutes);
 app.use("/api/nominations", nominationRoutes);
+app.use("/api/final", finalRoutes);
 
 export default app;
