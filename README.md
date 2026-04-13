@@ -15,6 +15,7 @@
 - [Database Collections](#database-collections)
 - [Authentication Flow](#authentication-flow)
 - [API Endpoints](#api-endpoints)
+- [Health Check](#health-check)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [Scripts](#scripts)
@@ -224,6 +225,46 @@ Few endpoints prefixed with `/api`.
 
 ---
 
+### 🏥 Health Check — `/`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/` | ❌ Public | Server health status and system information |
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-04-13T20:23:12.000Z",
+  "uptime": 123.456,
+  "server": {
+    "nodeVersion": "v18.17.0",
+    "platform": "win32",
+    "architecture": "x64",
+    "memoryUsage": {
+      "rss": "45 MB",
+      "heapTotal": "32 MB",
+      "heapUsed": "28 MB"
+    }
+  },
+  "database": {
+    "status": "connected",
+    "collections": ["users", "titles", "nominations", "votes", "results", "otps", "systemconfigs"]
+  },
+  "system": {
+    "currentPhase": "final_voting",
+    "isVotingOpen": true
+  },
+  "api": {
+    "version": "1.0.0",
+    "baseUrl": "/api",
+    "endpoints": ["/api/auth", "/api/user", "/api/titles", "/api/nominations", "/api/final"]
+  }
+}
+```
+
+---
+
 ### 🔐 Auth — `/api/auth`
 
 | Method | Endpoint | Auth | Description |
@@ -340,6 +381,64 @@ Authorization: Bearer <token>
 
 ---
 
+## 🏥 Health Check
+
+The root endpoint (`/`) provides comprehensive server health information including:
+
+- **Server Status**: Node.js version, platform, memory usage
+- **Database Status**: MongoDB connection and available collections
+- **System State**: Current phase and voting status
+- **API Information**: Version and available endpoints
+
+**Usage:**
+```bash
+curl http://localhost:5000/
+```
+
+**Response (Healthy):**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-04-13T20:23:12.000Z",
+  "uptime": 123.456,
+  "server": {
+    "nodeVersion": "v18.17.0",
+    "platform": "win32",
+    "architecture": "x64",
+    "memoryUsage": {
+      "rss": "45 MB",
+      "heapTotal": "32 MB",
+      "heapUsed": "28 MB"
+    }
+  },
+  "database": {
+    "status": "connected",
+    "collections": ["users", "titles", "nominations", "votes", "results", "otps", "systemconfigs"]
+  },
+  "system": {
+    "currentPhase": "final_voting",
+    "isVotingOpen": true
+  },
+  "api": {
+    "version": "1.0.0",
+    "baseUrl": "/api",
+    "endpoints": ["/api/auth", "/api/user", "/api/titles", "/api/nominations", "/api/final"]
+  }
+}
+```
+
+**Response (Unhealthy - Database Issue):**
+```json
+{
+  "status": "unhealthy",
+  "timestamp": "2026-04-13T20:23:12.000Z",
+  "error": "Database connection failed",
+  "uptime": 123.456
+}
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -376,9 +475,24 @@ Create a `.env` file in the root directory:
 PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/csd-awards
 JWT_SECRET=your_super_secret_key_here
-EMAIL_USER=yourgmail@gmail.com
-EMAIL_PASS=your_gmail_app_password
+
+# Email Configuration (for OTP sending)
+EMAIL_SERVICE=gmail
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASSWORD=your_app_specific_password
 ```
+
+### Email Setup Instructions
+
+**For Gmail:**
+1. Enable 2-Step Verification on your Google Account
+2. Generate an **App Password** at https://myaccount.google.com/apppasswords
+3. Use the generated 16-character password as `EMAIL_PASSWORD`
+4. Set `EMAIL_SERVICE=gmail`
+
+**For other email providers:**
+- Set `EMAIL_SERVICE` to your provider (e.g., `outlook`, `yahoo`, `sendgrid`)
+- Or configure custom SMTP in `src/utils/mailer.ts`
 
 > ⚠️ **Never commit your `.env` file.** It is listed in `.gitignore`.
 
@@ -412,11 +526,13 @@ npm start
 
 ## 🔒 Security Notes
 
-- OTPs expire after **5 minutes**
-- JWTs expire after **1 day**
-- All admin routes are protected by both `authMiddleware` and `adminMiddleware`
-- Duplicate votes and nominations are prevented at both application and database index level
-- Titles are soft-deleted (not permanently removed) to preserve audit integrity
+- **OTP Security**: OTPs are hashed using bcrypt before storage and never stored in plain text
+- **OTP Expiration**: OTPs expire after **5 minutes** and are automatically deleted after verification
+- **JWT Security**: JWTs expire after **1 day**
+- **Admin Protection**: All admin routes are protected by both `authMiddleware` and `adminMiddleware`
+- **Vote/Nomination Integrity**: Duplicate votes and nominations are prevented at both application and database index level
+- **Data Auditability**: Titles are soft-deleted (not permanently removed) to preserve audit integrity
+- **Email Validation**: OTPs are sent only to registered user emails via secure SMTP
 
 ---
 
